@@ -1,0 +1,23 @@
+[Unit]
+Description=Kraken Bot - Sistema de Lectura de Mercado
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USER
+WorkingDirectory=/path/to/kraken-bot
+ExecStart=/path/to/kraken-bot/.venv/bin/python main.py --continuous
+Restart=always
+RestartSec=60
+
+# Limitar recursos
+MemoryMax=512M
+CPUQuota=50%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kraken-bot
+
+[Install]
+WantedBy=multi-user.target

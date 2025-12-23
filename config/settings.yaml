@@ -1,0 +1,61 @@
+# Kraken Bot - Configuración Central
+# Este archivo contiene todos los parámetros del sistema
+
+# Configuración del Exchange
+exchange:
+  name: "kraken"
+  # Pares de trading a monitorear (formato: BASE/QUOTE)
+  symbols:
+    - "BTC/USD"
+    - "ETH/USD"
+  # Timeframe de las velas (1m, 5m, 15m, 30m, 1h, 4h, 1d)
+  timeframe: "15m"
+  # Número de velas a descargar en cada consulta
+  limit: 100
+
+# Configuración de Base de Datos
+database:
+  # Path de la base de datos SQLite
+  path: "data/ohlcv.db"
+  # Nombre de la tabla principal
+  table: "ohlcv"
+
+# Configuración de Logging
+logging:
+  # Nivel de logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  level: "INFO"
+  # Formato de los mensajes
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  # Formato de fecha/hora
+  date_format: "%Y-%m-%d %H:%M:%S"
+  # Archivo de log
+  file: "logs/bot.log"
+  # Tamaño máximo del archivo de log (en bytes, 10MB)
+  max_bytes: 10485760
+  # Número de archivos de backup
+  backup_count: 5
+  # Mostrar logs en consola también
+  console: true
+
+# Configuración de Indicadores (para uso futuro)
+indicators:
+  rsi:
+    period: 14
+    overbought: 70
+    oversold: 30
+
+# Configuración de Scheduler (modo continuo)
+scheduler:
+  # Intervalo entre ciclos en segundos (300 = 5 minutos)
+  interval: 300
+  # Número máximo de reintentos en caso de error
+  max_retries: 3
+  # Delay entre reintentos en segundos
+  retry_delay: 60
+
+# Configuración de Alertas (para uso futuro)
+alerts:
+  telegram:
+    enabled: false
+    bot_token: ""
+    chat_id: ""

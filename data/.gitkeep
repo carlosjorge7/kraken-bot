@@ -1,0 +1,2 @@
+# Este archivo mantiene el directorio data/ en git
+# Los archivos .db serán ignorados por .gitignore
