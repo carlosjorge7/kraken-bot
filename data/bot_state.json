@@ -1,0 +1,31 @@
+{
+  "markets": [
+    {
+      "symbol": "BTC/USD",
+      "timeframe": "15m"
+    },
+    {
+      "symbol": "ETH/USD",
+      "timeframe": "15m"
+    }
+  ],
+  "status": {
+    "BTC/USD": {
+      "timeframe": "15m",
+      "last_price": 87800.0,
+      "rsi_value": null,
+      "rsi_state": null,
+      "last_update": "2025-12-25T23:35:07.716928",
+      "data_available": true
+    },
+    "ETH/USD": {
+      "timeframe": "15m",
+      "last_price": 2938.76,
+      "rsi_value": null,
+      "rsi_state": null,
+      "last_update": "2025-12-25T23:35:07.716931",
+      "data_available": true
+    }
+  },
+  "last_update": "2025-12-25T23:35:07.716923"
+}
