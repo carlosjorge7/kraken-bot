@@ -12,54 +12,54 @@
   "status": {
     "BTC/USD": {
       "timeframe": "30m",
-      "last_price": 86951.0,
+      "last_price": 87000.0,
       "rsi_value": null,
       "rsi_state": null,
       "prediction": {
         "direction": "DOWN",
-        "confidence": 0.5165193662977571,
+        "confidence": 0.504599055734981,
         "horizon": "next_3_candles",
         "quality": "LOW",
         "reasons": [
-          "Momentum de precio negativo (-2.26%)",
+          "Momentum de precio negativo (-2.21%)",
           "Volumen decreciente - se\u00f1al d\u00e9bil"
         ],
         "technical_scores": {
           "rsi_signal": 0.0,
           "rsi_momentum": 0.0,
-          "price_momentum": -0.7325084512674396,
+          "price_momentum": -0.6657547121158937,
           "volume_trend": -0.7
         },
-        "timestamp": "2025-12-26T16:45:28.391833"
+        "timestamp": "2025-12-26T16:50:32.070871"
       },
-      "last_update": "2025-12-26T16:45:29.439836",
+      "last_update": "2025-12-26T16:50:33.233726",
       "data_available": true
     },
     "ETH/USD": {
       "timeframe": "30m",
-      "last_price": 2913.46,
+      "last_price": 2916.07,
       "rsi_value": null,
       "rsi_state": null,
       "prediction": {
         "direction": "DOWN",
-        "confidence": 0.5450544397426984,
+        "confidence": 0.5264137802521535,
         "horizon": "next_3_candles",
         "quality": "LOW",
         "reasons": [
-          "Momentum de precio negativo (-2.33%)",
+          "Momentum de precio negativo (-2.24%)",
           "Volumen decreciente - se\u00f1al d\u00e9bil"
         ],
         "technical_scores": {
           "rsi_signal": 0.0,
           "rsi_momentum": 0.0,
-          "price_momentum": -0.8923048625591113,
+          "price_momentum": -0.7879171694120594,
           "volume_trend": -0.7
         },
-        "timestamp": "2025-12-26T16:45:29.433347"
+        "timestamp": "2025-12-26T16:50:33.221408"
       },
-      "last_update": "2025-12-26T16:45:29.439839",
+      "last_update": "2025-12-26T16:50:33.233733",
       "data_available": true
     }
   },
-  "last_update": "2025-12-26T16:45:29.439833"
+  "last_update": "2025-12-26T16:50:33.233721"
 }
