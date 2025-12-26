@@ -12,7 +12,10 @@ from backend.app.models.schemas import (
     HealthResponse,
     MarketsResponse,
     StatusResponse,
-    AlertsResponse
+    AlertsResponse,
+    PredictionsResponse,
+    BacktestMetrics,
+    BacktestSummary
 )
 from backend.app.services.state_reader import state_reader
 
@@ -88,7 +91,7 @@ async def get_status():
 
 
 @router.get(
-    "/status/{symbol}",
+    "/status/{symbol:path}",
     response_model=StatusResponse,
     summary="Estado de un Mercado",
     description="Obtiene el estado de un mercado específico"
@@ -147,3 +150,136 @@ async def get_alerts(limit: Optional[int] = 50):
         total=len(alerts),
         last_update=last_update
     )
+
+
+@router.get(
+    "/predictions",
+    response_model=PredictionsResponse,
+    summary="Predicciones de Dirección",
+    description="Obtiene predicciones probabilísticas de dirección para todos los mercados"
+)
+async def get_predictions():
+    """
+    Obtiene predicciones de dirección para todos los mercados.
+    
+    Las predicciones son probabilísticas (UP/DOWN/NEUTRAL) con nivel de confianza.
+    NO predicen precio exacto, solo dirección probable.
+    
+    Returns:
+        Predicciones para todos los mercados
+    """
+    predictions = state_reader.get_predictions()
+    
+    return PredictionsResponse(
+        predictions=predictions,
+        timestamp=datetime.now().isoformat()
+    )
+
+
+@router.get(
+    "/predictions/{symbol:path}",
+    response_model=PredictionsResponse,
+    summary="Predicción de un Mercado",
+    description="Obtiene la predicción de dirección para un mercado específico"
+)
+async def get_market_prediction(symbol: str):
+    """
+    Obtiene la predicción para un mercado específico.
+    
+    Args:
+        symbol: Símbolo del mercado (ej: BTC/USD, BTC-USD, BTCUSD)
+    
+    Returns:
+        Predicción del mercado
+    """
+    # Normalizar símbolo
+    symbol = symbol.replace('-', '/').replace('_', '/')
+    
+    prediction = state_reader.get_market_prediction(symbol)
+    
+    if not prediction:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Predicción para '{symbol}' no encontrada"
+        )
+    
+    return PredictionsResponse(
+        predictions=[prediction],
+        timestamp=datetime.now().isoformat()
+    )
+
+
+# ============================================================================
+# BACKTESTING ENDPOINTS
+# ============================================================================
+
+@router.get(
+    "/backtest/metrics",
+    response_model=BacktestMetrics,
+    summary="Métricas de Backtesting",
+    description="Obtiene métricas históricas de precisión de predicciones"
+)
+async def get_backtest_metrics(
+    symbol: Optional[str] = None,
+    min_confidence: Optional[float] = None
+):
+    """
+    Obtiene métricas detalladas del backtesting.
+    
+    Args:
+        symbol: Filtrar por símbolo (ej: BTC/USD)
+        min_confidence: Confianza mínima (0-1)
+    
+    Returns:
+        Métricas de precisión por horizonte, confianza y calidad
+    """
+    try:
+        metrics = state_reader.get_backtest_metrics(
+            symbol=symbol,
+            min_confidence=min_confidence
+        )
+        
+        if not metrics:
+            raise HTTPException(
+                status_code=404,
+                detail="No hay métricas de backtesting disponibles"
+            )
+        
+        return metrics
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error obteniendo métricas: {str(e)}"
+        )
+
+
+@router.get(
+    "/backtest/summary",
+    response_model=BacktestSummary,
+    summary="Resumen de Backtesting",
+    description="Obtiene un resumen del estado del backtesting"
+)
+async def get_backtest_summary():
+    """
+    Obtiene resumen del backtesting.
+    
+    Returns:
+        Conteo de predicciones y última actualización
+    """
+    try:
+        summary = state_reader.get_backtest_summary()
+        
+        if not summary:
+            raise HTTPException(
+                status_code=404,
+                detail="No hay datos de backtesting disponibles"
+            )
+        
+        return summary
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error obteniendo resumen: {str(e)}"
+        )

@@ -18,6 +18,9 @@ import pandas as pd
 from fetcher.kraken_client import KrakenClient
 from data.database import DatabaseManager
 from indicators.rsi import calculate_rsi, get_rsi_signal
+from predictive.predictor import DirectionalPredictor, PredictionSignal, Horizon
+from predictive.enhanced_predictor import EnhancedPredictor
+from analytics.backtester import PredictionBacktester
 
 
 class Engine:
@@ -82,6 +85,24 @@ class Engine:
         self.alerts_file = "data/alerts.json"
         self._ensure_state_files()
         
+        # Predictor mejorado (opcional, se activa con config)
+        self.enable_predictions = config.get('predictions', {}).get('enabled', True)
+        self.predictor = None
+        if self.enable_predictions:
+            self.predictor = EnhancedPredictor(config)
+            self.logger.info("Predictor mejorado activado")
+        
+        # Backtester (opcional, se activa con config)
+        self.enable_backtesting = config.get('backtesting', {}).get('enabled', False)
+        self.backtester = None
+        if self.enable_backtesting:
+            bt_config = config.get('backtesting', {})
+            self.backtester = PredictionBacktester(
+                db_path=bt_config.get('db_path', 'data/backtesting.db'),
+                json_path=bt_config.get('json_path', 'data/backtesting.json')
+            )
+            self.logger.info("Backtester activado")
+        
         self.logger.info("Engine inicializado correctamente")
     
     def _ensure_state_files(self):
@@ -123,6 +144,7 @@ class Engine:
                 "last_price": market_data.get('last_price'),
                 "rsi_value": market_data.get('rsi_value'),
                 "rsi_state": market_data.get('rsi_state'),
+                "prediction": market_data.get('prediction'),  # Incluir predicción
                 "last_update": datetime.now().isoformat(),
                 "data_available": True
             }
@@ -276,6 +298,7 @@ class Engine:
         # Calcular y mostrar RSI
         rsi_value = None
         rsi_signal = None
+        rsi_series = None
         
         try:
             rsi_period = 14
@@ -303,6 +326,103 @@ class Engine:
         except Exception as e:
             self.logger.info(f"📉 RSI: No disponible (error: {e})")
         
+        # Generar predicción mejorada si está habilitado
+        prediction_data = None
+        if self.predictor and rsi_series is not None:
+            try:
+                # Generar predicción mejorada
+                enhanced_pred = self.predictor.predict(
+                    df=df,
+                    rsi_series=rsi_series,
+                    horizon=Horizon.NEXT_3_CANDLES,
+                    symbol=display_symbol
+                )
+                
+                # Mostrar predicción
+                self.logger.info("")
+                self.logger.info(f"🔮 PREDICCIÓN")
+                self.logger.info(f"  Dirección:      {enhanced_pred.direction}")
+                self.logger.info(f"  Confianza:      {enhanced_pred.confidence:.2%}")
+                self.logger.info(f"  Calidad:        {enhanced_pred.quality}")
+                self.logger.info(f"  Horizonte:      {enhanced_pred.horizon}")
+                
+                # Mostrar no-prediction info si está activa
+                if enhanced_pred.no_prediction and enhanced_pred.no_prediction.active:
+                    self.logger.info(f"  ⚠️  No-Prediction: {', '.join(enhanced_pred.no_prediction.rules_triggered)}")
+                
+                # Mostrar confirmación multi-timeframe si está activa
+                if enhanced_pred.confirmation and enhanced_pred.confirmation.enabled:
+                    conf = enhanced_pred.confirmation
+                    self.logger.info(f"  📊 Multi-TF:")
+                    for tf, pred_info in conf.predictions.items():
+                        self.logger.info(f"    {tf}: {pred_info['direction']} @ {pred_info['confidence']:.2%}")
+                    self.logger.info(f"    Confirmado: {'✓ Sí' if conf.confirmed else '✗ No'}")
+                    if conf.confidence_adjustment != 0:
+                        self.logger.info(f"    Ajuste: {conf.confidence_adjustment:+.2%}")
+                
+                self.logger.info(f"  Razones:")
+                for reason in enhanced_pred.reasons:
+                    self.logger.info(f"    • {reason}")
+                
+                # Registrar en backtester si está habilitado
+                if self.backtester and not (enhanced_pred.no_prediction and enhanced_pred.no_prediction.active):
+                    try:
+                        pred_id = self.backtester.record_prediction(
+                            symbol=display_symbol,
+                            timeframe=self.timeframe,
+                            direction=enhanced_pred.direction,
+                            confidence=enhanced_pred.confidence,
+                            quality=enhanced_pred.quality,
+                            horizon=enhanced_pred.horizon,
+                            price=float(latest['close'])
+                        )
+                        self.logger.debug(f"Predicción registrada en backtester (ID: {pred_id})")
+                    except Exception as e:
+                        self.logger.warning(f"Error al registrar en backtester: {e}")
+                
+                # Verificar predicciones previas con backtester
+                if self.backtester and self.config.get('backtesting', {}).get('auto_verify', True):
+                    try:
+                        verified = self.backtester.verify_predictions(display_symbol, df)
+                        if verified > 0:
+                            self.logger.debug(f"Verificadas {verified} predicciones anteriores")
+                    except Exception as e:
+                        self.logger.warning(f"Error al verificar predicciones: {e}")
+                
+                # Preparar datos para guardar en estado
+                prediction_data = {
+                    "direction": enhanced_pred.direction,
+                    "confidence": enhanced_pred.confidence,
+                    "horizon": enhanced_pred.horizon,
+                    "quality": enhanced_pred.quality,
+                    "reasons": enhanced_pred.reasons,
+                    "technical_scores": enhanced_pred.technical_scores,
+                    "timestamp": enhanced_pred.timestamp
+                }
+                
+                # Añadir confirmación si existe
+                if enhanced_pred.confirmation:
+                    prediction_data["confirmation"] = {
+                        "enabled": enhanced_pred.confirmation.enabled,
+                        "predictions": enhanced_pred.confirmation.predictions,
+                        "confirmed": enhanced_pred.confirmation.confirmed,
+                        "confidence_adjustment": enhanced_pred.confirmation.confidence_adjustment,
+                        "rule": enhanced_pred.confirmation.rule
+                    }
+                
+                # Añadir no-prediction info si existe
+                if enhanced_pred.no_prediction and enhanced_pred.no_prediction.active:
+                    prediction_data["no_prediction"] = {
+                        "active": enhanced_pred.no_prediction.active,
+                        "rules_triggered": enhanced_pred.no_prediction.rules_triggered,
+                        "note": enhanced_pred.no_prediction.note
+                    }
+                
+            except Exception as e:
+                self.logger.warning(f"Error al generar predicción: {e}")
+                import traceback
+                self.logger.debug(traceback.format_exc())
+        
         self.logger.info("-" * 60)
         self.logger.info("")
         
@@ -311,7 +431,8 @@ class Engine:
             "symbol": display_symbol,
             "last_price": float(latest['close']),
             "rsi_value": rsi_value,
-            "rsi_state": rsi_signal
+            "rsi_state": rsi_signal,
+            "prediction": prediction_data
         }
     
     def _process_rsi_alert(self, symbol: str, rsi_value: float, rsi_signal: str) -> None:

@@ -9,7 +9,7 @@ exchange:
     - "BTC/USD"
     - "ETH/USD"
   # Timeframe de las velas (1m, 5m, 15m, 30m, 1h, 4h, 1d)
-  timeframe: "15m"
+  timeframe: "30m"
   # Número de velas a descargar en cada consulta
   limit: 100
 
@@ -59,3 +59,49 @@ alerts:
     enabled: false
     bot_token: ""
     chat_id: ""
+
+# Configuración de Predicciones
+predictions:
+  # Activar/desactivar capa predictiva
+  enabled: true
+  # Horizonte temporal por defecto (next_1_candle, next_3_candles, next_5_candles)
+  default_horizon: "next_3_candles"
+  # Umbral mínimo de confianza para considerar la predicción
+  min_confidence: 0.5
+  # Pesos de cada señal técnica (deben sumar 1.0)
+  weights:
+    rsi_signal: 0.35
+    rsi_momentum: 0.20
+    price_momentum: 0.25
+    volume_trend: 0.20
+
+  # Thresholds operativos (PASO 2)
+  thresholds:
+    low: 0.55 # confidence < 0.55 = LOW
+    medium: 0.65 # 0.55 <= confidence < 0.65 = MEDIUM
+    high: 0.65 # confidence >= 0.65 = HIGH
+
+  # Confirmación multi-timeframe (PASO 3)
+  multi_timeframe:
+    enabled: false # Se activará en PASO 3
+    timeframes: ["15m", "1h"]
+    confidence_boost: 0.05 # Aumento si confirma
+    confidence_penalty: 0.05 # Reducción si contradice
+
+  # Reglas de no-predicción (PASO 4)
+  no_prediction:
+    enabled: false # Se activará en PASO 4
+    rules:
+      low_momentum_threshold: 0.005 # |price_change| < 0.5%
+      low_volume_percentile: 0.20 # Volumen bajo percentil 20
+      min_confidence_absolute: 0.52 # Mínimo absoluto
+
+# Configuración de Backtesting (PASO 1)
+backtesting:
+  enabled: true
+  db_path: "data/backtesting.db"
+  json_path: "data/backtesting.json"
+  # Verificar predicciones automáticamente en cada ciclo
+  auto_verify: true
+  # Threshold para considerar movimiento (0.1% por defecto)
+  movement_threshold: 0.001

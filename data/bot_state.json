@@ -2,30 +2,64 @@
   "markets": [
     {
       "symbol": "BTC/USD",
-      "timeframe": "15m"
+      "timeframe": "30m"
     },
     {
       "symbol": "ETH/USD",
-      "timeframe": "15m"
+      "timeframe": "30m"
     }
   ],
   "status": {
     "BTC/USD": {
-      "timeframe": "15m",
-      "last_price": 87800.0,
+      "timeframe": "30m",
+      "last_price": 86951.0,
       "rsi_value": null,
       "rsi_state": null,
-      "last_update": "2025-12-25T23:35:07.716928",
+      "prediction": {
+        "direction": "DOWN",
+        "confidence": 0.5165193662977571,
+        "horizon": "next_3_candles",
+        "quality": "LOW",
+        "reasons": [
+          "Momentum de precio negativo (-2.26%)",
+          "Volumen decreciente - se\u00f1al d\u00e9bil"
+        ],
+        "technical_scores": {
+          "rsi_signal": 0.0,
+          "rsi_momentum": 0.0,
+          "price_momentum": -0.7325084512674396,
+          "volume_trend": -0.7
+        },
+        "timestamp": "2025-12-26T16:45:28.391833"
+      },
+      "last_update": "2025-12-26T16:45:29.439836",
       "data_available": true
     },
     "ETH/USD": {
-      "timeframe": "15m",
-      "last_price": 2938.76,
+      "timeframe": "30m",
+      "last_price": 2913.46,
       "rsi_value": null,
       "rsi_state": null,
-      "last_update": "2025-12-25T23:35:07.716931",
+      "prediction": {
+        "direction": "DOWN",
+        "confidence": 0.5450544397426984,
+        "horizon": "next_3_candles",
+        "quality": "LOW",
+        "reasons": [
+          "Momentum de precio negativo (-2.33%)",
+          "Volumen decreciente - se\u00f1al d\u00e9bil"
+        ],
+        "technical_scores": {
+          "rsi_signal": 0.0,
+          "rsi_momentum": 0.0,
+          "price_momentum": -0.8923048625591113,
+          "volume_trend": -0.7
+        },
+        "timestamp": "2025-12-26T16:45:29.433347"
+      },
+      "last_update": "2025-12-26T16:45:29.439839",
       "data_available": true
     }
   },
-  "last_update": "2025-12-25T23:35:07.716923"
+  "last_update": "2025-12-26T16:45:29.439833"
 }
