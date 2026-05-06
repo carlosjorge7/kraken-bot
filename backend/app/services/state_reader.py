@@ -153,36 +153,55 @@ class StateReader:
     # ALERTS
     # ========================================================================
     
+    # Mapeo del campo 'type' que escribe el engine al RSIState que espera la API
+    _TYPE_TO_RSI_STATE = {
+        "rsi_oversold": RSIState.OVERSOLD,
+        "rsi_overbought": RSIState.OVERBOUGHT,
+    }
+
     def get_alerts(self, limit: Optional[int] = None) -> List[Alert]:
         """
         Obtiene las alertas guardadas.
-        
+
         Lee desde el archivo de alertas generado por el bot.
         """
+        import logging
+        logger = logging.getLogger(__name__)
+
         alerts_data = self._read_json(self.alerts_file)
         alerts_list = alerts_data.get('alerts', [])
-        
-        # Aplicar límite si se especifica
+
+        # Las alertas se insertan al principio (más nuevas primero)
         if limit:
-            alerts_list = alerts_list[-limit:]
-        
-        # Convertir a modelos Pydantic
+            alerts_list = alerts_list[:limit]
+
         alerts = []
         for idx, alert_data in enumerate(alerts_list):
             try:
+                # El engine escribe 'type' y 'rsi_value'; la API usa 'state' y 'rsi'
+                raw_type = alert_data.get('type', '')
+                rsi_state = self._TYPE_TO_RSI_STATE.get(raw_type)
+                if rsi_state is None:
+                    # Intentar parsear directamente por si viene con el formato nuevo
+                    rsi_state = RSIState(alert_data['state'])
+
+                rsi_value = alert_data.get('rsi_value') or alert_data.get('rsi')
+                if rsi_value is None:
+                    raise KeyError('rsi_value/rsi ausente')
+
                 alert = Alert(
-                    id=idx,
+                    id=alert_data.get('id', idx),
                     symbol=alert_data['symbol'],
-                    rsi=alert_data['rsi'],
-                    state=RSIState(alert_data['state']),
+                    rsi=float(rsi_value),
+                    state=rsi_state,
                     timestamp=alert_data['timestamp'],
                     message=alert_data.get('message')
                 )
                 alerts.append(alert)
-            except (KeyError, ValueError):
-                # Ignorar alertas malformadas
+            except (KeyError, ValueError) as e:
+                logger.warning(f"Alerta malformada (idx={idx}): {e} | datos={alert_data}")
                 continue
-        
+
         return alerts
     
     def get_latest_alert(self) -> Optional[Alert]:

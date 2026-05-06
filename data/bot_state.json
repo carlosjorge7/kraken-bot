@@ -12,12 +12,12 @@
   "status": {
     "BTC/USD": {
       "timeframe": "30m",
-      "last_price": 81581.7,
-      "rsi_value": null,
-      "rsi_state": null,
+      "last_price": 81370.1,
+      "rsi_value": 48.35858181530502,
+      "rsi_state": "NEUTRAL",
       "prediction": {
         "direction": "NEUTRAL",
-        "confidence": 0.3252958479117908,
+        "confidence": 0.34874530348382266,
         "horizon": "next_3_candles",
         "quality": "LOW",
         "reasons": [
@@ -25,39 +25,39 @@
         ],
         "technical_scores": {
           "rsi_signal": 0.0,
-          "rsi_momentum": 0.0,
-          "price_momentum": 0.30355017494148945,
+          "rsi_momentum": -0.1505244576319385,
+          "price_momentum": -0.46452407570032134,
           "volume_trend": 0.0
         },
-        "timestamp": "2026-05-06T23:49:57.719830"
+        "timestamp": "2026-05-07T00:11:11.983198"
       },
-      "last_update": "2026-05-06T23:49:59.051191",
+      "last_update": "2026-05-07T00:11:13.195986",
       "data_available": true
     },
     "ETH/USD": {
       "timeframe": "30m",
-      "last_price": 2354.87,
-      "rsi_value": null,
-      "rsi_state": null,
+      "last_price": 2348.81,
+      "rsi_value": 41.37387320493613,
+      "rsi_state": "NEUTRAL",
       "prediction": {
         "direction": "NEUTRAL",
-        "confidence": 0.3740324120793608,
+        "confidence": 0.3800211522502719,
         "horizon": "next_3_candles",
         "quality": "LOW",
         "reasons": [
           "Se\u00f1ales t\u00e9cnicas mixtas o d\u00e9biles"
         ],
         "technical_scores": {
-          "rsi_signal": 0.0,
-          "rsi_momentum": 0.0,
-          "price_momentum": 0.3283889449523297,
-          "volume_trend": 0.7
+          "rsi_signal": 0.07792715811939707,
+          "rsi_momentum": -0.11270180071776392,
+          "price_momentum": -0.41919040779620764,
+          "volume_trend": -0.7
         },
-        "timestamp": "2026-05-06T23:49:59.040284"
+        "timestamp": "2026-05-07T00:11:13.183827"
       },
-      "last_update": "2026-05-06T23:49:59.051194",
+      "last_update": "2026-05-07T00:11:13.195991",
       "data_available": true
     }
   },
-  "last_update": "2026-05-06T23:49:59.051185"
+  "last_update": "2026-05-07T00:11:13.195979"
 }

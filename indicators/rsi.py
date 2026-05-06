@@ -12,55 +12,60 @@ from typing import Optional
 def calculate_rsi(df: pd.DataFrame, period: int = 14, column: str = 'close') -> pd.Series:
     """
     Calcula el RSI (Relative Strength Index) usando el método de Wilder.
-    
+
     El RSI mide la velocidad y magnitud de los cambios de precio,
     oscilando entre 0 y 100.
-    
+
     Fórmula:
         RSI = 100 - (100 / (1 + RS))
         RS = Promedio de ganancias / Promedio de pérdidas
-    
+
     Args:
         df: DataFrame con datos de precios
         period: Periodo para el cálculo (default: 14)
         column: Columna a usar para el cálculo (default: 'close')
-    
+
     Returns:
         pd.Series: Serie con valores RSI (NaN donde no hay datos suficientes)
-    
+
     Raises:
         ValueError: Si la columna no existe o no hay suficientes datos
     """
     if column not in df.columns:
         raise ValueError(f"Columna '{column}' no encontrada en DataFrame")
-    
+
     if len(df) < period + 1:
         raise ValueError(
             f"Se requieren al menos {period + 1} datos. "
             f"DataFrame tiene {len(df)} filas"
         )
-    
+
     # Calcular cambios de precio
     delta = df[column].diff()
-    
+
     # Separar ganancias y pérdidas
-    gain = delta.clip(lower=0)
-    loss = -delta.clip(upper=0)
-    
-    # Primera media: Simple Moving Average
-    avg_gain = gain.rolling(window=period, min_periods=period).mean()
-    avg_loss = loss.rolling(window=period, min_periods=period).mean()
-    
+    gain = delta.clip(lower=0).values
+    loss = (-delta.clip(upper=0)).values
+
+    # Usar arrays numpy para evitar problemas de asignación con pandas 2.x
+    avg_gain = np.full(len(df), np.nan)
+    avg_loss = np.full(len(df), np.nan)
+
+    # Primera media: SMA de los primeros `period` valores
+    avg_gain[period - 1] = np.mean(gain[1:period + 1])
+    avg_loss[period - 1] = np.mean(loss[1:period + 1])
+
     # Medias subsecuentes: Smoothed (método de Wilder)
     for i in range(period, len(df)):
-        avg_gain.iloc[i] = (avg_gain.iloc[i-1] * (period - 1) + gain.iloc[i]) / period
-        avg_loss.iloc[i] = (avg_loss.iloc[i-1] * (period - 1) + loss.iloc[i]) / period
-    
-    # Calcular RS y RSI
-    rs = avg_gain / avg_loss
-    rsi = 100 - (100 / (1 + rs))
-    
-    return rsi
+        avg_gain[i] = (avg_gain[i - 1] * (period - 1) + gain[i]) / period
+        avg_loss[i] = (avg_loss[i - 1] * (period - 1) + loss[i]) / period
+
+    # Calcular RS y RSI evitando división por cero
+    with np.errstate(divide='ignore', invalid='ignore'):
+        rs = np.where(avg_loss == 0, np.inf, avg_gain / avg_loss)
+    rsi_values = 100 - (100 / (1 + rs))
+
+    return pd.Series(rsi_values, index=df.index)
 
 
 def get_rsi_signal(rsi_value: float, overbought: float = 70, oversold: float = 30) -> str:
