@@ -12,54 +12,52 @@
   "status": {
     "BTC/USD": {
       "timeframe": "30m",
-      "last_price": 87000.0,
+      "last_price": 81581.7,
       "rsi_value": null,
       "rsi_state": null,
       "prediction": {
-        "direction": "DOWN",
-        "confidence": 0.504599055734981,
+        "direction": "NEUTRAL",
+        "confidence": 0.3252958479117908,
         "horizon": "next_3_candles",
         "quality": "LOW",
         "reasons": [
-          "Momentum de precio negativo (-2.21%)",
-          "Volumen decreciente - se\u00f1al d\u00e9bil"
+          "Se\u00f1ales t\u00e9cnicas mixtas o d\u00e9biles"
         ],
         "technical_scores": {
           "rsi_signal": 0.0,
           "rsi_momentum": 0.0,
-          "price_momentum": -0.6657547121158937,
-          "volume_trend": -0.7
+          "price_momentum": 0.30355017494148945,
+          "volume_trend": 0.0
         },
-        "timestamp": "2025-12-26T16:50:32.070871"
+        "timestamp": "2026-05-06T23:49:57.719830"
       },
-      "last_update": "2025-12-26T16:50:33.233726",
+      "last_update": "2026-05-06T23:49:59.051191",
       "data_available": true
     },
     "ETH/USD": {
       "timeframe": "30m",
-      "last_price": 2916.07,
+      "last_price": 2354.87,
       "rsi_value": null,
       "rsi_state": null,
       "prediction": {
-        "direction": "DOWN",
-        "confidence": 0.5264137802521535,
+        "direction": "NEUTRAL",
+        "confidence": 0.3740324120793608,
         "horizon": "next_3_candles",
         "quality": "LOW",
         "reasons": [
-          "Momentum de precio negativo (-2.24%)",
-          "Volumen decreciente - se\u00f1al d\u00e9bil"
+          "Se\u00f1ales t\u00e9cnicas mixtas o d\u00e9biles"
         ],
         "technical_scores": {
           "rsi_signal": 0.0,
           "rsi_momentum": 0.0,
-          "price_momentum": -0.7879171694120594,
-          "volume_trend": -0.7
+          "price_momentum": 0.3283889449523297,
+          "volume_trend": 0.7
         },
-        "timestamp": "2025-12-26T16:50:33.221408"
+        "timestamp": "2026-05-06T23:49:59.040284"
       },
-      "last_update": "2025-12-26T16:50:33.233733",
+      "last_update": "2026-05-06T23:49:59.051194",
       "data_available": true
     }
   },
-  "last_update": "2025-12-26T16:50:33.233721"
+  "last_update": "2026-05-06T23:49:59.051185"
 }
